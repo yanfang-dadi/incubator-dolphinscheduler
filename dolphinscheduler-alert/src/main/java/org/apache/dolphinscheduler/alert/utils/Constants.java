@@ -177,4 +177,11 @@ public class Constants {
     public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERCCS = "receiverCcs";
 
     public static final String RETMAP_MSG = "msg";
+
+    /**
+     * rabbitMq
+     */
+    public static final String ALERT_SERVER_CONTEXT_KEY_MQ_HOST = "mq.host";
+    public static final String ALERT_SERVER_CONTEXT_KEY_MQ_HOST = "mq.host";
+
 }

@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.alert.runner;
 
 import org.apache.dolphinscheduler.alert.utils.Constants;
+import org.apache.dolphinscheduler.alert.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.plugin.PluginManager;
 import org.apache.dolphinscheduler.dao.AlertDao;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -80,8 +82,22 @@ public class AlertSender {
 
             alertInfo.addProp("receivers", receviersList);
 
-            AlertPlugin emailPlugin = pluginManager.findOne(Constants.PLUGIN_DEFAULT_EMAIL);
-            retMaps = emailPlugin.process(alertInfo);
+//            AlertPlugin emailPlugin = pluginManager.findOne(Constants.PLUGIN_DEFAULT_EMAIL);
+//            retMaps = emailPlugin.process(alertInfo);
+            //TODO yan
+            if (pluginManager != null){
+                logger.info("Addition ---------------- PluginManager is not null!");
+                if (pluginManager.findAll() !=null){
+                    logger.info("Addition ---------------- AlertPlugins in PluginManager is not null!");
+                    Iterator<AlertPlugin> pluginIterator = pluginManager.findAll().values().iterator();
+                    while (pluginIterator.hasNext()){
+                        AlertPlugin plugin = pluginIterator.next();
+                        logger.info("Addition ---------------- plugin: {} process begin, Alert info: {}",
+                                plugin.getName(), JSONUtils.toJsonString(alertInfo));
+                        retMaps = plugin.process(alertInfo);
+                    }
+                }
+            }
 
             if (retMaps == null) {
                 alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "alert send error", alert.getId());

@@ -40,6 +40,6 @@ public interface AlertPlugin {
      */
     PluginName getName();
 
-    Map<String, Object> process(AlertInfo info);
+    Map<String, Object> process(AlertInfo info, AlertContext alertContext);
 
 }

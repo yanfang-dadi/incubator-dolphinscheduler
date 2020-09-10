@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.alert;
 
 import org.apache.dolphinscheduler.alert.plugin.EmailAlertPlugin;
+import org.apache.dolphinscheduler.alert.plugin.RabbitMqAlertPlugin;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
@@ -25,6 +26,7 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.plugin.api.AlertContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,16 +56,17 @@ public class AlertServer {
             "org.slf4j."
     };
 
-    public AlertServer() {
+    public AlertServer(AlertContext alertContext) {
         alertPluginManager =
                 new FilePluginManager(PropertyUtils.getString(Constants.PLUGIN_DIR), whitePrefixes, excludePrefixes);
         // add default alert plugins
         alertPluginManager.addPlugin(new EmailAlertPlugin());
+        alertPluginManager.addPlugin(new RabbitMqAlertPlugin(//TODO));
     }
 
-    public synchronized static AlertServer getInstance() {
+    public synchronized static AlertServer getInstance(AlertContext alertContext) {
         if (null == instance) {
-            instance = new AlertServer();
+            instance = new AlertServer(alertContext);
         }
         return instance;
     }
@@ -85,7 +88,8 @@ public class AlertServer {
 
 
     public static void main(String[] args) {
-        AlertServer alertServer = AlertServer.getInstance();
+        AlertContext alertContext = new AlertContext(args);
+        AlertServer alertServer = AlertServer.getInstance(alertContext);
         alertServer.start();
     }
 
