@@ -20,17 +20,21 @@ import org.apache.dolphinscheduler.alert.plugin.EmailAlertPlugin;
 import org.apache.dolphinscheduler.alert.plugin.RabbitMqAlertPlugin;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
+import org.apache.dolphinscheduler.alert.utils.JSONUtils;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.plugin.FilePluginManager;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
-import org.apache.dolphinscheduler.plugin.api.AlertContext;
+import org.apache.dolphinscheduler.alert.plugin.AlertContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * alert of start
@@ -60,8 +64,8 @@ public class AlertServer {
         alertPluginManager =
                 new FilePluginManager(PropertyUtils.getString(Constants.PLUGIN_DIR), whitePrefixes, excludePrefixes);
         // add default alert plugins
-        alertPluginManager.addPlugin(new EmailAlertPlugin());
-        alertPluginManager.addPlugin(new RabbitMqAlertPlugin(//TODO));
+//        alertPluginManager.addPlugin(new EmailAlertPlugin());
+        alertPluginManager.addPlugin(new RabbitMqAlertPlugin(alertContext));
     }
 
     public synchronized static AlertServer getInstance(AlertContext alertContext) {
@@ -81,6 +85,9 @@ public class AlertServer {
                 Thread.currentThread().interrupt();
             }
             List<Alert> alerts = alertDao.listWaitExecutionAlert();
+            for (Alert alert : alerts){
+                logger.info("Find alert: {}", JSONUtils.toJsonString(alert));
+            }
             alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
             alertSender.run();
         }

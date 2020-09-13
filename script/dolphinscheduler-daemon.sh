@@ -80,7 +80,7 @@ elif [ "$command" = "alert-server" ]; then
   HEAP_MAX_SIZE=1g
   HEAP_NEW_GENERATION__SIZE=500m
   LOG_FILE="-Dlogback.configurationFile=conf/logback-alert.xml"
-  CLASS=org.apache.dolphinscheduler.alert.AlertServer
+  CLASS=org.apache.dolphinscheduler.alert.AlertServer 47.93.122.220 30015 admin Du4U8QLk87sDX82V6FAkd2LA dev dolphin dolphin.result
 elif [ "$command" = "logger-server" ]; then
   HEAP_INITIAL_SIZE=1g
   HEAP_MAX_SIZE=1g

@@ -92,13 +92,15 @@ public class AlertSender {
                     Iterator<AlertPlugin> pluginIterator = pluginManager.findAll().values().iterator();
                     while (pluginIterator.hasNext()){
                         AlertPlugin plugin = pluginIterator.next();
-                        logger.info("Addition ---------------- plugin: {} process begin, Alert info: {}",
+                        logger.info("---------------- find plugin: {},  process begin, Alert info: {}",
                                 plugin.getName(), JSONUtils.toJsonString(alertInfo));
                         retMaps = plugin.process(alertInfo);
                     }
                 }
             }
 
+            logger.info("---------------alert plugin process result: {} ------------------",
+                    retMaps == null? "null" : JSONUtils.toJsonString(retMaps));
             if (retMaps == null) {
                 alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "alert send error", alert.getId());
                 logger.info("alert send error : return value is null");

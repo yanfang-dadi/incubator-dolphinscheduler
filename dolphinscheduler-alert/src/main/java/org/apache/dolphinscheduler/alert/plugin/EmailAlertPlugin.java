@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.EnterpriseWeChatUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.plugin.api.AlertContext;
 import org.apache.dolphinscheduler.plugin.api.AlertPlugin;
 import org.apache.dolphinscheduler.plugin.model.AlertData;
 import org.apache.dolphinscheduler.plugin.model.AlertInfo;
@@ -64,7 +63,7 @@ public class EmailAlertPlugin implements AlertPlugin {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, Object> process(AlertInfo info, AlertContext alertContext) {
+    public Map<String, Object> process(AlertInfo info) {
         Map<String, Object> retMaps = new HashMap<>();
 
         AlertData alert = info.getAlertData();

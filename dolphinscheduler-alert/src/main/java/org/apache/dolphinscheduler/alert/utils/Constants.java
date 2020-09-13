@@ -179,9 +179,13 @@ public class Constants {
     public static final String RETMAP_MSG = "msg";
 
     /**
-     * rabbitMq
+     * rabbitMq plugin
      */
     public static final String ALERT_SERVER_CONTEXT_KEY_MQ_HOST = "mq.host";
-    public static final String ALERT_SERVER_CONTEXT_KEY_MQ_HOST = "mq.host";
-
+    public static final String ALERT_SERVER_CONTEXT_KEY_MQ_PORT = "mq.port";
+    public static final String ALERT_SERVER_CONTEXT_KEY_MQ_USER = "mq.user";
+    public static final String ALERT_SERVER_CONTEXT_KEY_MQ_PWD = "mq.pwd";
+    public static final String ALERT_SERVER_CONTEXT_KEY_MQ_V_HOST = "mq.vhost";
+    public static final String ALERT_SERVER_CONTEXT_KEY_MQ_EXCHANGE = "mq.exchange";
+    public static final String ALERT_SERVER_CONTEXT_KEY_MQ_ROUTING_KEY = "mq.rkey";
 }
