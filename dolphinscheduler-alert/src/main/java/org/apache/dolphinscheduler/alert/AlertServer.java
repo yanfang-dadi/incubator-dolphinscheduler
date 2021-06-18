@@ -64,7 +64,7 @@ public class AlertServer {
         alertPluginManager =
                 new FilePluginManager(PropertyUtils.getString(Constants.PLUGIN_DIR), whitePrefixes, excludePrefixes);
         // add default alert plugins
-//        alertPluginManager.addPlugin(new EmailAlertPlugin());
+        alertPluginManager.addPlugin(new EmailAlertPlugin());
         alertPluginManager.addPlugin(new RabbitMqAlertPlugin(alertContext));
     }
 

@@ -191,8 +191,10 @@ public class ProcessInstance {
 
     /**
      * process instance priority
+     * process instance priority
      */
     private Priority processInstancePriority;
+
 
     /**
      * worker group

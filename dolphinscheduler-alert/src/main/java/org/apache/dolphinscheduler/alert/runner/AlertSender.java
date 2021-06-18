@@ -33,6 +33,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * alert sender
@@ -44,6 +47,9 @@ public class AlertSender {
     private List<Alert> alertList;
     private AlertDao alertDao;
     private PluginManager pluginManager;
+
+    private ExecutorService executorEmailPlugin = Executors.newFixedThreadPool(4);
+    private ExecutorService executorMqPlugin = Executors.newFixedThreadPool(4);
 
     public AlertSender() {
     }
@@ -94,25 +100,45 @@ public class AlertSender {
                         AlertPlugin plugin = pluginIterator.next();
                         logger.info("---------------- find plugin: {},  process begin, Alert info: {}",
                                 plugin.getName(), JSONUtils.toJsonString(alertInfo));
-                        retMaps = plugin.process(alertInfo);
+                        if (Constants.PLUGIN_DEFAULT_EMAIL.equals(plugin.getId())){
+                            executorEmailPlugin.execute(new AlertProcessRunnable(plugin,alertInfo));
+                        }else if ("rabbit.mq.alert".equals(plugin.getId())){
+                            executorMqPlugin.execute(new AlertProcessRunnable(plugin,alertInfo));
+                        }
                     }
                 }
             }
 
             logger.info("---------------alert plugin process result: {} ------------------",
                     retMaps == null? "null" : JSONUtils.toJsonString(retMaps));
-            if (retMaps == null) {
-                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "alert send error", alert.getId());
-                logger.info("alert send error : return value is null");
-            } else if (!Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)))) {
-                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, String.valueOf(retMaps.get(Constants.MESSAGE)), alert.getId());
-                logger.info("alert send error : {}", retMaps.get(Constants.MESSAGE));
-            } else {
-                alertDao.updateAlert(AlertStatus.EXECUTION_SUCCESS, (String) retMaps.get(Constants.MESSAGE), alert.getId());
+//            if (retMaps == null) {
+//                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "alert send error", alert.getId());
+//                logger.info("alert send error : return value is null");
+//            } else if (!Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)))) {
+//                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, String.valueOf(retMaps.get(Constants.MESSAGE)), alert.getId());
+//                logger.info("alert send error : {}", retMaps.get(Constants.MESSAGE));
+//            } else {
+                alertDao.updateAlert(AlertStatus.EXECUTION_SUCCESS,retMaps == null? "no message": (String) retMaps.get(Constants.MESSAGE), alert.getId());
                 logger.info("alert send success");
-            }
+//            }
         }
 
+    }
+
+    private class AlertProcessRunnable implements Runnable{
+
+        private AlertPlugin alertPlugin;
+        private AlertInfo alertInfo;
+
+        public AlertProcessRunnable(AlertPlugin alertPlugin, AlertInfo alertInfo) {
+            this.alertPlugin = alertPlugin;
+            this.alertInfo = alertInfo;
+        }
+
+        @Override
+        public void run() {
+            alertPlugin.process(alertInfo);
+        }
     }
 
 }
